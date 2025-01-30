@@ -1,6 +1,5 @@
 "use client";
 
-import { LoginSchema, LoginValues } from "@/lib/validations";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,23 +13,38 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { SignUpSchema, SignUpValues } from "@/lib/validations";
 
-const LoginForm = () => {
-  const form = useForm<LoginValues>({
-    resolver: zodResolver(LoginSchema),
+const SignupForm = () => {
+  const form = useForm<SignUpValues>({
+    resolver: zodResolver(SignUpSchema),
     defaultValues: {
+      email: "",
       username: "",
       password: "",
     },
   });
 
-  function onSubmit(valeus: LoginValues) {
+  function onSubmit(valeus: SignUpValues) {
     // implement
   }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input placeholder="Email" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name="username"
@@ -63,4 +77,4 @@ const LoginForm = () => {
   );
 };
 
-export default LoginForm;
+export default SignupForm;
