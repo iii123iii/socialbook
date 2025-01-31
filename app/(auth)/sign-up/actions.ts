@@ -7,6 +7,7 @@ import { hash } from "@node-rs/argon2";
 import { lucia } from "@/auth";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { generateIdFromEntropySize } from "lucia";
 
 export const signUp = async (values: SignUpValues) => {
   try {
@@ -36,21 +37,19 @@ export const signUp = async (values: SignUpValues) => {
 
     const hashedPassword = await hash(password);
 
+    const userId = generateIdFromEntropySize(10);
+
     const user = await prisma.user.create({
       data: {
+        id: userId,
         email,
         username,
         displayName: username,
         passwordHash: hashedPassword,
       },
-      select: {
-        id: true,
-        username: true,
-        displayName: true,
-      },
     });
 
-    const session = await lucia.createSession(user.id.toString(), user);
+    const session = await lucia.createSession(user.id.toString(), {});
     const sessionCookie = lucia.createSessionCookie(session.id);
 
     (await cookies()).set(
@@ -62,6 +61,8 @@ export const signUp = async (values: SignUpValues) => {
     return redirect("/");
   } catch (error) {
     if (isRedirectError(error)) throw error;
+    console.log(error);
+
     return {
       error: "Somthing went went wrong please try again.",
     };
